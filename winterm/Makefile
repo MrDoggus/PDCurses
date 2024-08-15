@@ -26,10 +26,10 @@ include $(common)/libobjs.mif
 
 PDCURSES_WIN_H	= $(osdir)/pdcwin.h
 
-CC		= gcc
+CC		= x86_64-w64-mingw32-gcc
 AR		= ar
 STRIP		= strip
-LINK		= gcc
+LINK		= x86_64-w64-mingw32-gcc
 WINDRES		= windres
 
 ifeq ($(DEBUG),Y)

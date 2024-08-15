@@ -19,15 +19,29 @@ static bool in_italic = FALSE;
 
 void PDC_gotoyx(int row, int col)
 {
-    COORD coord;
+    
 
     PDC_LOG(("PDC_gotoyx() - called: row %d col %d from row %d col %d\n",
              row, col, SP->cursrow, SP->curscol));
 
-    coord.X = col;
-    coord.Y = row;
+    if (pdc_ansi)
+    {
+        // str buffer
+        char p[64];
 
-    SetConsoleCursorPosition(pdc_con_out, coord);
+        // add one to x and y because ANSI coords start at index 1, not index 0
+        snprintf(p, 64, "\x1b[%d;%dH", y+1, x+1);
+        WriteConsoleA(pdc_con_out, p, strlen(p), NULL, NULL);
+    }
+    else
+    {
+        COORD coord;
+
+        coord.X = col;
+        coord.Y = row;
+
+        SetConsoleCursorPosition(pdc_con_out, coord);
+    }
 }
 
 void _set_ansi_color(short f, short b, attr_t attr)
@@ -247,6 +261,7 @@ NONANSI:
         sr.Left = x;
         sr.Right = x + len - 1;
 
+        // Even though WriteConsoleOutput isnt in window's "ecosystem roadmap", this is only reached if there is no ansi so its fine.
         WriteConsoleOutput(pdc_con_out, buffer, bufSize, bufPos, &sr);
     }
 }
